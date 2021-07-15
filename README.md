@@ -35,43 +35,43 @@ All non-trivial build customizations are done in the `gradle-plugins`, which get
 
 1. `incomplete-lib`:
 
-The Android target gets the implementation of the `expect` API right inside the `incomplete-lib`.
+    The Android target gets the implementation of the `expect` API right inside the `incomplete-lib`.
 
-We also define the targets JVM and JS, which won't have actual implementations inside `incomplete-lib`. Then, for these
-two targets, the plugin:
+    We also define the targets JVM and JS, which won't have actual implementations inside `incomplete-lib`. Then, for these
+    two targets, the plugin:
 
-* disables the platform compilations, so that the compilation tasks don't fail because of missing `actual`s;
-* include the incomplete library markers in the (otherwise empty) platform artifacts, so that the consumer can find out
-  that there is an incomplete library on the classpath that needs a completing library
+    * disables the platform compilations, so that the compilation tasks don't fail because of missing `actual`s;
+    * include the incomplete library markers in the (otherwise empty) platform artifacts, so that the consumer can find out
+      that there is an incomplete library on the classpath that needs a completing library
 
 2. `completing-lib`:
 
-We define just the two targets JVM and JS (it would be OK to implement them separately, even each in a single-platform
-project, too, but here they are in a single Multiplatform project). Then the plugin does the following:
+    We define just the two targets JVM and JS (it would be OK to implement them separately, even each in a single-platform
+    project, too, but here they are in a single Multiplatform project). Then the plugin does the following:
 
-* create a new source set `incompleteMain`, which imports the sources of `incomplete-lib` into `completing-lib`;
-* disable the compilation of `incompleteMain` to Kotlin Metadata (KLIB), because it's already compiled to Kotlin
-  Metadata by `incomplete-lib`, and `completing-lib` should not redistribute the symbols of `incomplete-lib` in the
-  common artifacts again;
-* add a dependency on `incomplete-lib` to `incompleteMain`, so that the project also receives the dependencies of
-  `incomplete-lib` as transitive ones and compiles against them;
-* make `commonMain` depend on `incompleteMain`, so all targets must provide the actual implementations;
-* include the completing library markers into the platform artifacts of the two targets, so that the consumer can find
-  them on the classpath and match them with the incomplete library's markers, verifying that the implementation is
-  there;
+    * create a new source set `incompleteMain`, which imports the sources of `incomplete-lib` into `completing-lib`;
+    * disable the compilation of `incompleteMain` to Kotlin Metadata (KLIB), because it's already compiled to Kotlin
+      Metadata by `incomplete-lib`, and `completing-lib` should not redistribute the symbols of `incomplete-lib` in the
+      common artifacts again;
+    * add a dependency on `incomplete-lib` to `incompleteMain`, so that the project also receives the dependencies of
+      `incomplete-lib` as transitive ones and compiles against them;
+    * make `commonMain` depend on `incompleteMain`, so all targets must provide the actual implementations;
+    * include the completing library markers into the platform artifacts of the two targets, so that the consumer can find
+      them on the classpath and match them with the incomplete library's markers, verifying that the implementation is
+      there;
 
 3. `consumer-lib`:
 
-This is a consumer project that is written agains the incomplete library with the implementations provided by the
-completing library attached.
+    This is a consumer project that is written agains the incomplete library with the implementations provided by the
+    completing library attached.
 
-The source set `commonMain` depends on just `incomplete-lib`, and its code can reference the common API of
-`incomplete-lib`. The JVM and JS targets get a dependency on `completing-lib` (their shared source set `jvmAndJsMain`
-can also use the common API from the `completing-lib`).
+    The source set `commonMain` depends on just `incomplete-lib`, and its code can reference the common API of
+    `incomplete-lib`. The JVM and JS targets get a dependency on `completing-lib` (their shared source set `jvmAndJsMain`
+    can also use the common API from the `completing-lib`).
 
-The plugin checks the incomplete and completing library markers on the classpath and reports missing completing 
-libraries. You can remove the dependency on `completing-lib` from `jvmAndJsMain` (or move it to one of the 
-platform-specific source sets) to see the plugin reporting an error about an unsatisfied incomplete library. 
+    The plugin checks the incomplete and completing library markers on the classpath and reports missing completing 
+    libraries. You can remove the dependency on `completing-lib` from `jvmAndJsMain` (or move it to one of the 
+    platform-specific source sets) to see the plugin reporting an error about an unsatisfied incomplete library. 
 
 ## Project presets
 

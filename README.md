@@ -2,7 +2,10 @@
 
 This repository is a proof of concept for publishing a multiplatform library with some of its targets not contained in
 the core library codebase – therefore the library is called "incomplete". The implementations ("`actual`s") for those
-targets are provided by some other project – a "completing" module.
+targets are provided by some other project – a "completing" module. 
+
+The "consumer" library demonstrates using the incomplete library in one of the targets and the completing library's
+implementations for the other targets.
 
 ## How to build
 
@@ -17,9 +20,12 @@ The builds will publish the artifacts in the repository root's `build/repo`.
 
 ## Working with IDE
 
-* Don't open `incomplete-lib` and `completing-lib` in the same IntelliJ project, as the IDE will fail to include the
+* Import `incomplete-lib`, `completing-lib`, and `consumer-lib` as Gradle projects. 
+
+* Don't import `incomplete-lib` and `completing-lib` in the same IntelliJ project, as the IDE will fail to include the
   `incomplete-lib`'s common sources into both projects (resulting into *missing `expect`* in `completing-lib`). Import
   the projects into two different IDE instances instead.
+  
 * The `incomplete-lib` will report missing `actual`s for JVM and JS; this is expected (and probably needs some
   workaround to get rid of the reported errors).
 
